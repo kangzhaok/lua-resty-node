@@ -5,7 +5,7 @@ local tonumber = tonumber
 local pcall = pcall
 local error = error
 
-local _M = { _VERSION = '0.0.1' }
+local _M = { _VERSION = '0.0.2' }
 local mt = { __index = _M }
 
 local function do_watcher(premature, watcher)

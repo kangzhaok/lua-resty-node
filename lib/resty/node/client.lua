@@ -4,10 +4,9 @@ local watcher = require "resty.node.watcher"
 local monitor = require "resty.upstream.monitor"
 
 local setmetatable = setmetatable
-local str_format = string.format
 local pcall = pcall
 
-local _M = { _VERSION = '0.0.1' }
+local _M = { _VERSION = '0.0.2' }
 local mt = { __index = _M }
 
 local ok, new_tab = pcall(require, "table.new")
@@ -15,10 +14,8 @@ if not ok then
     new_tab = function(narr, nrec) return {} end
 end
 
-function _M.new(api_url, region, healthcheck)
+function _M.new(healthcheck)
     return setmetatable({
-        api_url = api_url,
-        region = region,
         healthcheck = healthcheck,
         watchers = {} -- watcher缓存
     }, mt)
@@ -48,14 +45,8 @@ function _M.request(self, uri, params, timeout)
 end
 
 function _M.get_data(self, ctx, timeout)
-    local uri = str_format("%s/%s/%s/%s?region=%s",
-            self.api_url, ctx.app, ctx.ups, ctx.env, self.region)
-
-    local data, err = self:request(uri, {
-        headers = {
-            ["Content-Type"] = "application/json",
-            ["Authorization"] = "b2c257b8908d4e4caa12ff0947894490",
-        }
+    local data, err = self:request(ctx.url, {
+        headers = ctx.headers
     }, timeout)
     if not data then
         return nil, err
